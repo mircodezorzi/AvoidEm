@@ -1,0 +1,16 @@
+TITLE = "Don't touch the gray squares!"
+SCALE = 1
+HEIGHT = int(1280 / SCALE)
+WIDTH = int(720 / SCALE)
+
+PLAYER_SPEED = 25
+TILESIZE = 32
+FPS = 60
+
+BACKGROUND_COLOR = (237, 225, 192)
+ENEMY_COLOR = (66, 64, 59)
+PLAYER_COLOR = (68, 133, 237)
+
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
