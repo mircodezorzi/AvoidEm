@@ -21,7 +21,7 @@ pygame.init()
 pygame.display.set_caption(TITLE)
 game_folder = path.dirname(__file__)
 
-class game:
+class Game:
 
     def __init__(self):
 
@@ -31,8 +31,9 @@ class game:
         self.all_sprites = pygame.sprite.Group()
         self.walls = pygame.sprite.Group()
 
+        self.all_sprites_list = []
+
         self.game_font = pygame.font.Font('origami.ttf', 40)
-        self.soundtrack = pygame.mixer.Sound('soundtrack.wav')
 
         self.pause_button = Button(self.screen, 0, 1200, 100, 200, BACKGROUND_COLOR, BACKGROUND_COLOR, 'Pause', 'origami', 20)
 
@@ -66,6 +67,8 @@ class game:
 
     def draw(self):
         self.screen.fill(BACKGROUND_COLOR)
+        for i in range(1, len(self.all_sprites_list)):
+            self.all_sprites_list[i].draw()
         self.all_sprites.draw(self.screen)
         self.pause_button.draw()
         self.score_label = self.game_font.render('Score: ' + str(self.score), 1, BLACK)
@@ -86,7 +89,7 @@ class game:
                 self.update()
                 self.draw()
             except:
-                pass
+                raise
 
     def save_data(self):
         file = open('data.txt', 'w')
@@ -158,7 +161,6 @@ class Main_Menu:
         except:
             pass
         game.load_data()
-        game.soundtrack.play(loops = 100)
         while True:
             self.events()
             self.draw()
@@ -245,8 +247,8 @@ class Create_Enemy(Thread):
     def run(self):
         while True:
             while not game.game_paused:
-                time.sleep((game.score + 1) / game.speed)
-                Enemy(game)
+                time.sleep((game.score + 10) / ((game.score ** 1.2) + 10) )
+                game.all_sprites_list.append(Enemy(game))
 
 
 class Save_Data(Thread):
@@ -261,7 +263,7 @@ class Save_Data(Thread):
 
 if __name__ == '__main__':
 
-    game = game()
+    game = Game()
     main_menu = Main_Menu()
     pause_menu = Pause_Menu()
     create_enemy = Create_Enemy()
