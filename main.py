@@ -1,3 +1,4 @@
+import operator
 import pygame
 import random
 import string
@@ -36,13 +37,15 @@ class Game:
         self.pause_button = Button(self.screen, 0, 1200, 100, 200, BACKGROUND_COLOR, BACKGROUND_COLOR, 'Pause', 'origami', 20)
 
         self.game_over = False
-        self.game_paused = False
         self.highscore = 0
         self.score = 0
         self.speed = 1
         self.deaths = 0
 
     def events(self):
+        keys = pygame.key.get_pressed()
+        if keys[K_ESCAPE]:
+            pause_menu.run()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game.save_data()
@@ -50,14 +53,27 @@ class Game:
                 sys.exit()
 
             mouse_pos = pygame.mouse.get_pos()
-            self.player.x = mouse_pos[0]
+            self.player.x = mouse_pos[0] - TILESIZE / 2
+            self.player.y = mouse_pos[1] - TILESIZE / 2
 
             if event.type == MOUSEBUTTONDOWN:
                 if self.pause_button.is_clicked(mouse_pos):
-                    self.game_paused = True
                     pause_menu.run()
 
     def update(self):
+        # Each time the score is a multiple of 10 the game spawns an Enemy
+        # 1/20 of chance that the enemy is a wall
+        # 5/20 of chance that the enemy is moving
+        if not operator.mod(self.score, 10):
+            temp = int(random.uniform(0, 20))
+            if   temp == 0:               EnemyWall(self)
+            elif temp >= 1 and temp <= 5: EnemyMoving(self)
+            else:                         Enemy(self)
+
+        # Each time the score is a multiple of 1000 the game automatically saves the data
+        if not operator.mod(self.score, 1000):
+            self.save_data()
+
         self.all_sprites.update()
         self.score += 1
         self.speed = self.score ** 1.2
@@ -80,7 +96,11 @@ class Game:
         self.player = Player(self, WIDTH / 2, HEIGHT * 4 / 5)
         while not self.game_over:
             try:
-                self.clock.tick(FPS)
+                # If the player pauses the game, this sets dt to normal
+                self.dt = self.clock.tick(FPS) / 10
+                if self.dt >= 5:
+                    self.dt = 1.6
+
                 self.events()
                 self.update()
                 self.draw()
@@ -134,12 +154,10 @@ class Main_Menu:
                     pygame.quit()
                     sys.exit()
                 if self.start_button.is_clicked(mouse_pos):
-                    try:
-                        create_enemy.start()
-                    except:
-                        pass
                     game.game_over = False
                     game.run()
+                if self.settings_button.is_clicked(mouse_pos):
+                    settings_munu.run()
                 if self.reset_stats_button.is_clicked(mouse_pos):
                     game.reset_data()
 
@@ -161,7 +179,33 @@ class Main_Menu:
             self.events()
             self.draw()
 
-class Pause_Menu():
+class Settings_Menu:
+
+    def __init__(self):
+        self.clock = pygame.time.Clock()
+        self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
+
+        self.back_button = Button(self.screen, 25, 250, 665, 120, BLACK, BLACK, 'Back', 'origami', 90, BACKGROUND_COLOR)
+
+    def events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                game.save_data()
+                pygame.quit()
+                sys.exit()
+            if event.type == MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+
+    def draw(self):
+        game.screen.fill(BACKGROUND_COLOR)
+        pygame.display.update()
+
+    def run(self):
+        while True:
+            self.events()
+            self.draw()
+
+class Pause_Menu:
 
     def __init__(self):
         self.clock = pygame.time.Clock()
@@ -183,7 +227,7 @@ class Pause_Menu():
             if event.type == MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
                 if self.back_button.is_clicked(mouse_pos):
-                    game.game_paused = False
+                    self.paused = False
                 if self.quit_button.is_clicked(mouse_pos):
                     main_menu.run()
 
@@ -196,8 +240,9 @@ class Pause_Menu():
         pygame.display.update()
 
     def run(self):
+        self.paused = True
         self.screen.blit(self.overlay_menu, (0, 0))
-        while game.game_paused:
+        while self.paused:
             self.events()
             self.update()
             self.draw()
@@ -235,37 +280,11 @@ class Button(pygame.sprite.Sprite):
         else:
             return False
 
-class Create_Enemy(Thread):
-
-    def __init__(self):
-        Thread.__init__(self)
-
-    def run(self):
-        while True:
-            while not game.game_paused:
-                time.sleep((game.score + 10) / ((game.score ** 1.2) + 10))
-                if not int(random.uniform(0, 9)):
-                    Enemy(game)
-                else:
-                    EnemyWall(game)
-
-
-class Save_Data(Thread):
-
-    def __init__(self):
-        Thread.__init__(self)
-
-    def run(self):
-        while True:
-            time.sleep(10)
-            game.save_data()
-
 if __name__ == '__main__':
 
     game = Game()
     main_menu = Main_Menu()
     pause_menu = Pause_Menu()
-    create_enemy = Create_Enemy()
-    save_data = Save_Data()
+    settings_munu = Settings_Menu()
 
     main_menu.run()
