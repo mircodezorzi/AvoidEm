@@ -31,8 +31,6 @@ class Game:
         self.all_sprites = pygame.sprite.Group()
         self.walls = pygame.sprite.Group()
 
-        self.all_sprites_list = []
-
         self.game_font = pygame.font.Font('origami.ttf', 40)
 
         self.pause_button = Button(self.screen, 0, 1200, 100, 200, BACKGROUND_COLOR, BACKGROUND_COLOR, 'Pause', 'origami', 20)
@@ -67,8 +65,6 @@ class Game:
 
     def draw(self):
         self.screen.fill(BACKGROUND_COLOR)
-        for i in range(1, len(self.all_sprites_list)):
-            self.all_sprites_list[i].draw()
         self.all_sprites.draw(self.screen)
         self.pause_button.draw()
         self.score_label = self.game_font.render('Score: ' + str(self.score), 1, BLACK)
@@ -247,8 +243,11 @@ class Create_Enemy(Thread):
     def run(self):
         while True:
             while not game.game_paused:
-                time.sleep((game.score + 10) / ((game.score ** 1.2) + 10) )
-                game.all_sprites_list.append(Enemy(game))
+                time.sleep((game.score + 10) / ((game.score ** 1.2) + 10))
+                if not int(random.uniform(0, 9)):
+                    Enemy(game)
+                else:
+                    EnemyWall(game)
 
 
 class Save_Data(Thread):

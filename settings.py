@@ -1,7 +1,6 @@
-TITLE = "Don't touch the gray squares!"
-SCALE = 1
-HEIGHT = int(1280 / SCALE)
-WIDTH = int(720 / SCALE)
+TITLE = "AvoidEm!"
+HEIGHT = 1280
+WIDTH = 720
 
 PLAYER_SPEED = 25
 TILESIZE = 32
