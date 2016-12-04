@@ -12,15 +12,10 @@ from settings import *
 from sprites import *
 from os import path
 
-try:
-    import pygame_sdl2
-    pygame_sdl2.import_as_pygame()
-except ImportError:
-    pass
-
 pygame.init()
 pygame.display.set_caption(TITLE)
 game_folder = path.dirname(__file__)
+
 
 class Game:
 
@@ -41,6 +36,7 @@ class Game:
         self.score = 0
         self.speed = 1
         self.deaths = 0
+        self.touchscreeen = False
 
     def events(self):
         keys = pygame.key.get_pressed()
@@ -53,9 +49,6 @@ class Game:
                 sys.exit()
 
             mouse_pos = pygame.mouse.get_pos()
-            self.player.x = mouse_pos[0] - TILESIZE / 2
-            self.player.y = mouse_pos[1] - TILESIZE / 2
-
             if event.type == MOUSEBUTTONDOWN:
                 if self.pause_button.is_clicked(mouse_pos):
                     pause_menu.run()
@@ -109,7 +102,7 @@ class Game:
 
     def save_data(self):
         file = open('data.txt', 'w')
-        file_str = file.write(str(self.highscore) + ';' + str(self.deaths) + ';')
+        file_str = file.write(str(self.highscore) + ';' + str(self.deaths) + ';' + str(self.touchscreeen) + ';')
 
     def load_data(self):
         file = open('data.txt', 'r')
@@ -117,9 +110,11 @@ class Game:
         try:
             self.highscore = int(file_str[0 : file_str.find(';')])
             self.deaths = int(file_str[file_str.find(';') + 1 : file_str.find(';', file_str.find(';') + 1,)])
+            self.touchscreeen = bool(0)
         except:
             self.highscore = 0
             self.deaths = 0
+            self.touchscreeen = False
 
     def reset_data(self):
         file = open('data.txt', 'w')
@@ -185,6 +180,7 @@ class Settings_Menu:
         self.clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
+        self.touchscreeen_button = Button(self.screen, 25, 100, 665, 120, BLACK, BLACK, 'touchscreeen', 'origami', 90, BACKGROUND_COLOR)
         self.back_button = Button(self.screen, 25, 250, 665, 120, BLACK, BLACK, 'Back', 'origami', 90, BACKGROUND_COLOR)
 
     def events(self):
@@ -195,12 +191,20 @@ class Settings_Menu:
                 sys.exit()
             if event.type == MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
+                if self.touchscreeen_button.is_clicked(mouse_pos):
+                    game.touchscreeen = not game.touchscreeen
+                if self.back_button.is_clicked(mouse_pos):
+                    game.save_data()
+                    main_menu.run()
 
     def draw(self):
         game.screen.fill(BACKGROUND_COLOR)
+        self.touchscreeen_button.draw()
+        self.back_button.draw()
         pygame.display.update()
 
     def run(self):
+        game.load_data()
         while True:
             self.events()
             self.draw()
