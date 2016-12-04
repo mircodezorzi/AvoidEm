@@ -29,7 +29,7 @@ class Game:
 
         self.game_font = pygame.font.Font('roboto.ttf', 40)
 
-        self.pause_button = Button(self.screen, 0, 650, 120, 50, BACKGROUND_COLOR, BACKGROUND_COLOR, 'Pause', 'roboto', 20)
+        self.pause_button = Button(self.screen, 0, 850, 90, 50, BACKGROUND_COLOR, BACKGROUND_COLOR, 'Pause', 'roboto', 20)
 
         self.game_over = False
         self.touchscreeen = True
@@ -130,9 +130,9 @@ class Main_Menu:
         self.clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
-        self.start_button = Button(self.screen, 25, 100, 665, 120, BLACK, BLACK, 'Start', 'roboto', 90, BACKGROUND_COLOR)
-        self.settings_button = Button(self.screen, 25, 250, 665, 120, BLACK, BLACK, 'Options', 'roboto', 90, BACKGROUND_COLOR)
-        self.quit_button = Button(self.screen, 25, 400, 665, 120, BLACK, BLACK, 'Quit', 'roboto', 90, BACKGROUND_COLOR)
+        self.start_button = Button(self.screen, 25, 600, 400, 80, BLACK, BLACK, 'Start', 'roboto', 50, BACKGROUND_COLOR)
+        self.settings_button = Button(self.screen, 25, 700, 400, 80, BLACK, BLACK, 'Options', 'roboto', 50, BACKGROUND_COLOR)
+        self.quit_button = Button(self.screen, 25, 800, 400, 80, BLACK, BLACK, 'Quit', 'roboto', 50, BACKGROUND_COLOR)
 
         self.reset_stats_button = Button(self.screen, 500, 1200, 215, 60, BLACK, BLACK, 'Reset Stats', 'roboto', 20, BACKGROUND_COLOR)
 
