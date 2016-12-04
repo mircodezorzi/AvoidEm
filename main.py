@@ -27,16 +27,18 @@ class Game:
         self.all_sprites = pygame.sprite.Group()
         self.walls = pygame.sprite.Group()
 
-        self.game_font = pygame.font.Font('origami.ttf', 40)
+        self.game_font = pygame.font.Font('Roboto-Thin.ttf', 40)
 
-        self.pause_button = Button(self.screen, 0, 1200, 100, 200, BACKGROUND_COLOR, BACKGROUND_COLOR, 'Pause', 'origami', 20)
+        self.pause_button = Button(self.screen, 0, 650, 120, 50, BACKGROUND_COLOR, BACKGROUND_COLOR, 'Pause', 'Roboto-Thin', 20)
 
         self.game_over = False
+        self.touchscreeen = True
+
         self.highscore = 0
         self.score = 0
         self.speed = 1
         self.deaths = 0
-        self.touchscreeen = False
+        self.counter = 0
 
     def events(self):
         keys = pygame.key.get_pressed()
@@ -55,13 +57,14 @@ class Game:
 
     def update(self):
         # Each time the score is a multiple of 10 the game spawns an Enemy
-        # 1/20 of chance that the enemy is a wall
+        # 3/20 of chance that the enemy is a wall
         # 5/20 of chance that the enemy is moving
         if not operator.mod(self.score, 10):
             temp = int(random.uniform(0, 20))
-            if   temp == 0:               EnemyWall(self)
-            elif temp >= 1 and temp <= 5: EnemyMoving(self)
-            else:                         Enemy(self)
+            if   temp >= 1 and temp <= 3 and self.counter <= 0: EnemyWall(self); self.counter = 5
+            elif temp >= 3 and temp <= 8:                       EnemyMoving(self)
+            else:                                               Enemy(self)
+            self.counter -= 1
 
         # Each time the score is a multiple of 1000 the game automatically saves the data
         if not operator.mod(self.score, 1000):
@@ -81,7 +84,7 @@ class Game:
         self.highscore_label = self.game_font.render('Highscore: ' + str(self.highscore), 1, BLACK)
         self.screen.blit(self.highscore_label, (0, 50))
         self.deaths_label = self.game_font.render('Deaths: ' + str(self.deaths), 1, BLACK)
-        self.screen.blit(self.deaths_label, (400, 0))
+        self.screen.blit(self.deaths_label, (0, 100))
         pygame.display.update()
 
     def run(self):
@@ -110,15 +113,15 @@ class Game:
         try:
             self.highscore = int(file_str[0 : file_str.find(';')])
             self.deaths = int(file_str[file_str.find(';') + 1 : file_str.find(';', file_str.find(';') + 1,)])
-            self.touchscreeen = bool(0)
+            self.touchscreeen = bool(1)
         except:
             self.highscore = 0
             self.deaths = 0
-            self.touchscreeen = False
+            self.touchscreeen = True
 
     def reset_data(self):
         file = open('data.txt', 'w')
-        file_str = file.write('0;0;')
+        file_str = file.write('0;0;0;')
         self.load_data()
 
 class Main_Menu:
@@ -127,11 +130,11 @@ class Main_Menu:
         self.clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
-        self.start_button = Button(self.screen, 25, 100, 665, 120, BLACK, BLACK, 'Start', 'origami', 90, BACKGROUND_COLOR)
-        self.settings_button = Button(self.screen, 25, 250, 665, 120, BLACK, BLACK, 'Settings', 'origami', 90, BACKGROUND_COLOR)
-        self.quit_button = Button(self.screen, 25, 400, 665, 120, BLACK, BLACK, 'Quit', 'origami', 90, BACKGROUND_COLOR)
+        self.start_button = Button(self.screen, 25, 100, 665, 120, BLACK, BLACK, 'Start', 'Roboto-Thin', 90, BACKGROUND_COLOR)
+        self.settings_button = Button(self.screen, 25, 250, 665, 120, BLACK, BLACK, 'Options', 'Roboto-Thin', 90, BACKGROUND_COLOR)
+        self.quit_button = Button(self.screen, 25, 400, 665, 120, BLACK, BLACK, 'Quit', 'Roboto-Thin', 90, BACKGROUND_COLOR)
 
-        self.reset_stats_button = Button(self.screen, 500, 1200, 215, 60, BLACK, BLACK, 'Reset Stats', 'origami', 20, BACKGROUND_COLOR)
+        self.reset_stats_button = Button(self.screen, 500, 1200, 215, 60, BLACK, BLACK, 'Reset Stats', 'Roboto-Thin', 20, BACKGROUND_COLOR)
 
         self.app_quit = False
 
@@ -180,8 +183,8 @@ class Settings_Menu:
         self.clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
-        self.touchscreeen_button = Button(self.screen, 25, 100, 665, 120, BLACK, BLACK, 'touchscreeen', 'origami', 90, BACKGROUND_COLOR)
-        self.back_button = Button(self.screen, 25, 250, 665, 120, BLACK, BLACK, 'Back', 'origami', 90, BACKGROUND_COLOR)
+        self.touchscreeen_button = Button(self.screen, 25, 100, 665, 120, BLACK, BLACK, 'Touchscreeen', 'Roboto-Thin', 90, BACKGROUND_COLOR)
+        self.back_button = Button(self.screen, 25, 250, 665, 120, BLACK, BLACK, 'Back', 'Roboto-Thin', 90, BACKGROUND_COLOR)
 
     def events(self):
         for event in pygame.event.get():
@@ -215,8 +218,8 @@ class Pause_Menu:
         self.clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
-        self.back_button = Button(self.screen, 25, 250, 665, 120, BLACK, BLACK, 'Back', 'origami', 90, BACKGROUND_COLOR)
-        self.quit_button = Button(self.screen, 25, 400, 665, 120, BLACK, BLACK, 'Quit', 'origami', 90, BACKGROUND_COLOR)
+        self.back_button = Button(self.screen, 25, 250, 665, 120, BLACK, BLACK, 'Back', 'Roboto-Thin', 90, BACKGROUND_COLOR)
+        self.quit_button = Button(self.screen, 25, 400, 665, 120, BLACK, BLACK, 'Quit', 'Roboto-Thin', 90, BACKGROUND_COLOR)
 
         self.overlay_menu = pygame.Surface(self.screen.get_size())
         self.overlay_menu.set_alpha(150)
@@ -276,7 +279,7 @@ class Button(pygame.sprite.Sprite):
             pygame.draw.rect(self.screen, self.button_color_inactive, self.button_rect)
         else:
             pygame.draw.rect(self.screen, self.button_color_active, self.button_rect)
-        self.screen.blit(self.label, (self.x + 20, self.y + 20))
+        self.screen.blit(self.label, (self.x + 20, self.y + 0))
 
     def is_clicked(self, mouse_pos):
         if self.button_rect.collidepoint(mouse_pos):

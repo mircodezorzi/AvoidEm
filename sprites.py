@@ -82,9 +82,14 @@ class EnemyWall(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = pygame.Surface((WIDTH / 2, 50))
-        self.image.fill(ENEMY_COLOR)
+        self.image.fill(ENEMY_COLOR_WALL)
         self.rect = self.image.get_rect()
-        self.x = int(random.uniform(0, WIDTH))
+
+        temp = int(random.uniform(0, 3))
+        if   temp == 0: self.x = 0
+        elif temp == 1: self.x = WIDTH / 2
+        elif temp == 2: self.x = WIDTH * 1 / 4
+
         self.rect.x = self.x
         self.y = 0
 
@@ -97,8 +102,7 @@ class EnemyWall(pygame.sprite.Sprite):
             self.kill()
 
         self.rect.y += (self.game.score + 1500) / 300 * self.game.dt
-
-
+        
 class EnemyMoving(pygame.sprite.Sprite):
 
     def __init__(self, game):
