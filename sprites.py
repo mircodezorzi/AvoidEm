@@ -1,6 +1,4 @@
-import pygame
-import random
-import time
+import pygame, random, time
 
 from pygame.locals import *
 from settings import *
@@ -46,6 +44,8 @@ class Player(pygame.sprite.Sprite):
 
     def update(self):
         self.events()
+
+        # Bounds the player cords between 0 and height/width
         self.rect.x = min(self.rect.x, WIDTH - TILESIZE)
         self.rect.y = min(self.rect.y, HEIGHT- TILESIZE)
         self.rect.x = max(self.rect.x, 0)
@@ -102,7 +102,7 @@ class EnemyWall(pygame.sprite.Sprite):
             self.kill()
 
         self.rect.y += (self.game.score + 1500) / 300 * self.game.dt
-        
+
 class EnemyMoving(pygame.sprite.Sprite):
 
     def __init__(self, game):

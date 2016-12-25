@@ -1,11 +1,4 @@
-import operator
-import pygame
-import random
-import string
-import time
-import sys
-import os
-
+import operator, pygame, random, string, os, sys, time
 from pygame.locals import *
 from threading import *
 from settings import *
@@ -14,8 +7,9 @@ from os import path
 
 pygame.init()
 pygame.display.set_caption(TITLE)
-game_folder = path.dirname(__file__)
 
+soundtrack = pygame.mixer.Sound('C:\\Users\\Mirco\\Desktop\\soundtrack.wav')
+soundtrack.play()
 
 class Game:
 
@@ -28,17 +22,13 @@ class Game:
         self.walls = pygame.sprite.Group()
 
         self.game_font = pygame.font.Font('roboto.ttf', 40)
-
         self.pause_button = Button(self.screen, 0, 850, 90, 50, BACKGROUND_COLOR, BACKGROUND_COLOR, 'Pause', 'roboto', 20)
 
         self.game_over = False
         self.touchscreeen = True
 
-        self.highscore = 0
-        self.score = 0
-        self.speed = 1
-        self.deaths = 0
-        self.counter = 0
+        self.highscore = 0; self.score = 0; self.speed = 1; self.deaths = 0; self.counter = 0
+        self.volume = 100
 
     def events(self):
         keys = pygame.key.get_pressed()
@@ -80,11 +70,11 @@ class Game:
         self.all_sprites.draw(self.screen)
         self.pause_button.draw()
         self.score_label = self.game_font.render('Score: ' + str(self.score), 1, BLACK)
-        self.screen.blit(self.score_label, (0, 0))
+        self.screen.blit(self.score_label, (10, 10))
         self.highscore_label = self.game_font.render('Highscore: ' + str(self.highscore), 1, BLACK)
-        self.screen.blit(self.highscore_label, (0, 50))
+        self.screen.blit(self.highscore_label, (10, 60))
         self.deaths_label = self.game_font.render('Deaths: ' + str(self.deaths), 1, BLACK)
-        self.screen.blit(self.deaths_label, (0, 100))
+        self.screen.blit(self.deaths_label, (10, 110))
         pygame.display.update()
 
     def run(self):
@@ -113,11 +103,11 @@ class Game:
         try:
             self.highscore = int(file_str[0 : file_str.find(';')])
             self.deaths = int(file_str[file_str.find(';') + 1 : file_str.find(';', file_str.find(';') + 1,)])
-            self.touchscreeen = bool(1)
+            #self.touchscreeen = bool(1)
         except:
             self.highscore = 0
             self.deaths = 0
-            self.touchscreeen = True
+            #self.touchscreeen = True
 
     def reset_data(self):
         file = open('data.txt', 'w')
@@ -127,17 +117,30 @@ class Game:
 class Main_Menu:
 
     def __init__(self):
+
+        # Pygame stuff
         self.clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
-        self.start_button = Button(self.screen, 25, 600, 400, 80, BLACK, BLACK, 'Start', 'roboto', 50, BACKGROUND_COLOR)
-        self.settings_button = Button(self.screen, 25, 700, 400, 80, BLACK, BLACK, 'Options', 'roboto', 50, BACKGROUND_COLOR)
-        self.quit_button = Button(self.screen, 25, 800, 400, 80, BLACK, BLACK, 'Quit', 'roboto', 50, BACKGROUND_COLOR)
 
-        self.reset_stats_button = Button(self.screen, 500, 1200, 215, 60, BLACK, BLACK, 'Reset Stats', 'roboto', 20, BACKGROUND_COLOR)
-
+        self.settings_menu = False
         self.app_quit = False
 
+        # Main Menu
+        self.button_start = Button(self.screen, 50, 600, 400, 80, GRAY, LIGHT_GRAY, 'START', 'roboto-black', 50, WHITE)
+        self.button_settings = Button(self.screen, 50, 700, 400, 80, GRAY, LIGHT_GRAY, 'OPTIONS', 'roboto-black', 50, WHITE)
+        self.button_quit = Button(self.screen, 50, 800, 400, 80, GRAY, LIGHT_GRAY, 'QUIT', 'roboto-black', 50, WHITE)
+
+        # Settings Menu
+        self.audio_volume = PlusMinusControl(self.screen, 500, 600, game.volume)
+        self.button_touchscreen = Button(self.screen, 500, 700, 400, 80, WHITE, WHITE, 'TOUCHSCREEN', 'roboto-black', 50, WHITE)
+        self.button_back = Button(self.screen, 500, 800, 400, 80, GRAY, LIGHT_GRAY, 'BACK', 'roboto-black', 50, WHITE)
+
+        # Title
+        self.font = path.join('roboto-black.ttf')
+        self.title_font = pygame.font.Font(self.font, 200)
+        self.title = self.title_font.render('Avoid Em', 1, WHITE)
+        self.title_shadow = self.title_font.render('Avoid Em', 1, BLACK)
 
     def events(self):
         for event in pygame.event.get():
@@ -147,69 +150,49 @@ class Main_Menu:
                 sys.exit()
             if event.type == MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
-                if self.quit_button.is_clicked(mouse_pos):
+                if self.button_quit.is_clicked(mouse_pos):
                     game.save_data()
                     pygame.quit()
                     sys.exit()
-                if self.start_button.is_clicked(mouse_pos):
+                if self.button_start.is_clicked(mouse_pos):
                     game.game_over = False
+                    self.settings_menu = False
                     game.run()
-                if self.settings_button.is_clicked(mouse_pos):
-                    settings_munu.run()
-                if self.reset_stats_button.is_clicked(mouse_pos):
-                    game.reset_data()
-
-    def draw(self):
-        game.screen.fill(BACKGROUND_COLOR)
-        self.start_button.draw()
-        self.settings_button.draw()
-        self.quit_button.draw()
-        self.reset_stats_button.draw()
-        pygame.display.update()
-
-    def run(self):
-        try:
-            save_data.start()
-        except:
-            pass
-        game.load_data()
-        while True:
-            self.events()
-            self.draw()
-
-class Settings_Menu:
-
-    def __init__(self):
-        self.clock = pygame.time.Clock()
-        self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
-
-        self.touchscreeen_button = Button(self.screen, 25, 100, 665, 120, BLACK, BLACK, 'Touchscreeen', 'roboto', 90, BACKGROUND_COLOR)
-        self.back_button = Button(self.screen, 25, 250, 665, 120, BLACK, BLACK, 'Back', 'roboto', 90, BACKGROUND_COLOR)
-
-    def events(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                game.save_data()
-                pygame.quit()
-                sys.exit()
-            if event.type == MOUSEBUTTONDOWN:
-                mouse_pos = pygame.mouse.get_pos()
-                if self.touchscreeen_button.is_clicked(mouse_pos):
+                if self.button_settings.is_clicked(mouse_pos):
+                    self.settings_menu = True
+                if self.button_touchscreen.is_clicked(mouse_pos) and self.settings_menu:
                     game.touchscreeen = not game.touchscreeen
-                if self.back_button.is_clicked(mouse_pos):
+                if self.button_back.is_clicked(mouse_pos) and self.settings_menu:
+                    self.settings_menu = False
                     game.save_data()
-                    main_menu.run()
+
+    def updates(self):
+        soundtrack.set_volume(game.volume / 100)
+        if game.touchscreeen and self.settings_menu:
+            self.button_touchscreen.set_new_color(GREEN, LIGHT_GREEN)
+        else:
+            self.button_touchscreen.set_new_color(RED, LIGHT_RED)
 
     def draw(self):
         game.screen.fill(BACKGROUND_COLOR)
-        self.touchscreeen_button.draw()
-        self.back_button.draw()
+        self.button_start.draw()
+        self.button_settings.draw()
+        self.button_quit.draw()
+        if self.settings_menu:
+            self.button_touchscreen.draw()
+            self.button_back.draw()
+            #self.button_colors.draw()
+            self.audio_volume.draw()
+        self.screen.blit(self.title_shadow, (385, 105))
+        self.screen.blit(self.title, (380, 100))
         pygame.display.update()
 
     def run(self):
         game.load_data()
         while True:
+            self.dt =  self.clock.tick(FPS) / 10
             self.events()
+            self.updates()
             self.draw()
 
 class Pause_Menu:
@@ -218,8 +201,8 @@ class Pause_Menu:
         self.clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
-        self.back_button = Button(self.screen, 25, 250, 665, 120, BLACK, BLACK, 'Back', 'roboto', 90, BACKGROUND_COLOR)
-        self.quit_button = Button(self.screen, 25, 400, 665, 120, BLACK, BLACK, 'Quit', 'roboto', 90, BACKGROUND_COLOR)
+        self.button_back = Button(self.screen, 25, 250, 665, 120, BLACK, BLACK, 'Back', 'roboto', 90, BACKGROUND_COLOR)
+        self.button_quit = Button(self.screen, 25, 400, 665, 120, BLACK, BLACK, 'Quit', 'roboto', 90, BACKGROUND_COLOR)
 
         self.overlay_menu = pygame.Surface(self.screen.get_size())
         self.overlay_menu.set_alpha(150)
@@ -229,21 +212,18 @@ class Pause_Menu:
             if event.type == pygame.QUIT:
                 game.save_data()
                 pygame.quit()
-                sys.exit()
+                quit()
 
             if event.type == MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
-                if self.back_button.is_clicked(mouse_pos):
+                if self.button_back.is_clicked(mouse_pos):
                     self.paused = False
-                if self.quit_button.is_clicked(mouse_pos):
+                if self.button_quit.is_clicked(mouse_pos):
                     main_menu.run()
 
-    def update(self):
-        pass
-
     def draw(self):
-        self.back_button.draw()
-        self.quit_button.draw()
+        self.button_back.draw()
+        self.button_quit.draw()
         pygame.display.update()
 
     def run(self):
@@ -251,22 +231,21 @@ class Pause_Menu:
         self.screen.blit(self.overlay_menu, (0, 0))
         while self.paused:
             self.events()
-            self.update()
             self.draw()
 
-class Button(pygame.sprite.Sprite):
+class Button:
 
     def __init__(self, screen, x, y, w, h, button_color_active, button_color_inactive, text, font, size = 50, text_color = BLACK):
         self.screen = screen
-        self.x = x
-        self.y = y
-        self.w = w
-        self.h = h
+
+        self.game_folder = path.dirname(__file__)
+        self.font = path.join(self.game_folder, font + '.ttf')
+
+        self.x, self.y, self.w, self.h = x, y, w, h
         self.button_color_active = button_color_active
         self.button_color_inactive = button_color_inactive
-        self.text = text
-        self.font = path.join(game_folder, font + '.ttf')
-        self.size = size
+
+        self.text, self.size = text, size
         self.text_color = text_color
 
         self.button_rect = pygame.Rect(self.x, self.y, self.w, self.h)
@@ -274,24 +253,73 @@ class Button(pygame.sprite.Sprite):
         self.label = self.button_font.render(self.text, 1, self.text_color)
 
     def draw(self):
-        mouse_pos = pygame.mouse.get_pos()
-        if self.button_rect.collidepoint(mouse_pos):
+        if self.button_rect.collidepoint(pygame.mouse.get_pos()):
             pygame.draw.rect(self.screen, self.button_color_inactive, self.button_rect)
         else:
             pygame.draw.rect(self.screen, self.button_color_active, self.button_rect)
-        self.screen.blit(self.label, (self.x + 20, self.y + 0))
+        self.screen.blit(self.label, (self.x + 20, self.y + 5))
 
     def is_clicked(self, mouse_pos):
-        if self.button_rect.collidepoint(mouse_pos):
-            return True
+        return bool(self.button_rect.collidepoint(mouse_pos))
+
+    def set_new_color(self, active_color, inactive_color):
+        self.button_color_active = active_color
+        self.button_color_inactive = inactive_color
+
+class PlusMinusControl:
+
+    def __init__(self, screen, x, y, variable = ''):
+        self.screen = screen
+        self.variable = variable
+        self.variable_area_size = 240
+
+        self.x = x
+        self.y = y
+
+        self.plus_button = pygame.Rect(x, y, 80, 80)
+        self.variable_area = pygame.Rect(x + 80, y, self.variable_area_size, 80)
+        self.minus_button = pygame.Rect(x + self.variable_area_size + 80, y, 80, 80)
+
+        self.font = path.join('roboto-black.ttf')
+        self.label_font = pygame.font.Font(self.font, 100)
+        self.plus_label = self.label_font.render('+', 1, WHITE)
+        self.minus_label = self.label_font.render('_', 1, WHITE)
+
+        self.variable_font = pygame.font.Font(self.font, 70)
+        self.label = self.variable_font.render(str(self.variable), 1, WHITE)
+
+    def draw(self):
+        if self.plus_button.collidepoint(pygame.mouse.get_pos()):
+            pygame.draw.rect(self.screen, LIGHT_BLACK, self.plus_button)
         else:
-            return False
+            pygame.draw.rect(self.screen, LIGHTER_BLACK, self.plus_button)
+
+        if self.minus_button.collidepoint(pygame.mouse.get_pos()):
+            pygame.draw.rect(self.screen, LIGHT_BLACK, self.minus_button)
+        else:
+            pygame.draw.rect(self.screen, LIGHTER_BLACK, self.minus_button)
+
+        pygame.draw.rect(self.screen, LIGHT_GRAY, self.variable_area)
+        self.screen.blit(self.plus_label, (self.x + 12, self.y - 30))
+        self.screen.blit(self.minus_label, (self.x + self.variable_area_size + 100, self.y - 70))
+        self.screen.blit(self.label, (self.x + 130, self.y - 8))
+
+        self.update()
+
+    def update(self):
+        if pygame.mouse.get_pressed()[0]:
+            if self.plus_button.collidepoint(pygame.mouse.get_pos()) and self.variable < 100:
+                self.variable += 1
+                game.volume += 1
+            if self.minus_button.collidepoint(pygame.mouse.get_pos()) and self.variable > 0:
+                self.variable -= 1
+                game.volume -= 1
+        self.label = self.variable_font.render(str(self.variable), 1, WHITE)
 
 if __name__ == '__main__':
 
     game = Game()
     main_menu = Main_Menu()
     pause_menu = Pause_Menu()
-    settings_munu = Settings_Menu()
 
     main_menu.run()
