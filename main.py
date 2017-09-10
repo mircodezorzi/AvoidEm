@@ -124,7 +124,7 @@ class Main_Menu:
 
 
         self.settings_menu = False
-        self.app_quit = False
+        #self.app_quit = False
 
         # Main Menu
         self.button_start = Button(self.screen, 50, 600, 400, 80, GRAY, LIGHT_GRAY, 'START', 'roboto-black', 50, WHITE)
