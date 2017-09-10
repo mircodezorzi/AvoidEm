@@ -21,7 +21,6 @@ class Game:
         self.game_font = pygame.font.Font('roboto.ttf', 40)
         self.pause_button = Button(self.screen, 0, 850, 90, 50, BACKGROUND_COLOR, BACKGROUND_COLOR, 'Pause', 'roboto', 20)
 
-        self.game_over = False
         self.touchscreeen = True
 
         self.highscore = 0 
@@ -80,7 +79,7 @@ class Game:
     def run(self):
         self.all_sprites.empty()
         self.player = Player(self, WIDTH / 2, HEIGHT * 4 / 5)
-        while not self.game_over:
+        while True:
             try:
                 # If the player pauses the game, this sets dt to normal
                 self.dt = self.clock.tick(FPS) / 10
@@ -155,7 +154,6 @@ class Main_Menu:
                     pygame.quit()
                     sys.exit()
                 if self.button_start.is_clicked(mouse_pos):
-                    game.game_over = False
                     self.settings_menu = False
                     game.run()
                 if self.button_settings.is_clicked(mouse_pos):
