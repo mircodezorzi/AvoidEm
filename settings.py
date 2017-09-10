@@ -1,10 +1,8 @@
-import math
-
 from os import path; game_folder = path.dirname(__file__)
 
 TITLE = "AvoidEm!"
 HEIGHT = 900
-WIDTH = math.floor(HEIGHT * (16 / 9))
+WIDTH = int(HEIGHT * (16 / 9))
 
 TILESIZE = 32
 FPS = 60
