@@ -1,6 +1,5 @@
 import operator, pygame, random, string, os, sys, time
 from pygame.locals import *
-from threading import *
 from settings import *
 from sprites import *
 from os import path
@@ -46,7 +45,6 @@ class Game:
             if event.type == MOUSEBUTTONDOWN:
                 if self.pause_button.is_clicked(mouse_pos):
                     pause_menu.run()
-
 
     def update(self):
         # Each time the score is a multiple of 10 the game spawns an Enemy
