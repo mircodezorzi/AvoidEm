@@ -16,7 +16,6 @@ class Game:
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
         self.all_sprites = pygame.sprite.Group()
-        self.walls = pygame.sprite.Group()
 
         self.game_font = pygame.font.Font('roboto.ttf', 40)
         self.pause_button = Button(self.screen, 0, 850, 90, 50, BACKGROUND_COLOR, BACKGROUND_COLOR, 'Pause', 'roboto', 20)
