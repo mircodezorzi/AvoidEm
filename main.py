@@ -24,7 +24,11 @@ class Game:
         self.game_over = False
         self.touchscreeen = True
 
-        self.highscore = 0; self.score = 0; self.speed = 1; self.deaths = 0; self.counter = 0
+        self.highscore = 0 
+        self.score = 0 
+        self.speed = 1 
+        self.deaths = 0 
+        self.counter = 0
 
     def events(self):
         keys = pygame.key.get_pressed()
@@ -47,7 +51,7 @@ class Game:
         # 5/20 of chance that the enemy is moving
         if not operator.mod(self.score, 10):
             temp = int(random.uniform(0, 20))
-            if   temp >= 1 and temp <= 3 and self.counter <= 0: EnemyWall(self); self.counter = 5
+            if   temp >= 1 and temp <= 3 and self.counter <= 0: EnemyWall(self); self.counter = 10
             elif temp >= 3 and temp <= 8:                       EnemyMoving(self)
             else:                                               Enemy(self)
             self.counter -= 1
@@ -87,6 +91,7 @@ class Game:
                 self.update()
                 self.draw()
             except:
+                # The game is finished
                 raise
 
     def save_data(self):
