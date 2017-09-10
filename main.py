@@ -4,9 +4,6 @@ from settings import *
 from sprites import *
 from os import path
 
-pygame.init()
-pygame.display.set_caption(TITLE)
-
 class Game:
 
     def __init__(self):
@@ -317,6 +314,8 @@ class PlusMinusControl:
         self.label = self.variable_font.render(str(self.variable), 1, WHITE)
 
 if __name__ == '__main__':
+    pygame.init()
+    pygame.display.set_caption(TITLE)
 
     game = Game()
     main_menu = Main_Menu()
