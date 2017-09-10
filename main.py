@@ -38,10 +38,14 @@ class Game:
                 pygame.quit()
                 sys.exit()
 
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                pause_menu.run()
+                
             mouse_pos = pygame.mouse.get_pos()
             if event.type == MOUSEBUTTONDOWN:
                 if self.pause_button.is_clicked(mouse_pos):
                     pause_menu.run()
+
 
     def update(self):
         # Each time the score is a multiple of 10 the game spawns an Enemy
