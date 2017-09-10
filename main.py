@@ -8,9 +8,6 @@ from os import path
 pygame.init()
 pygame.display.set_caption(TITLE)
 
-soundtrack = pygame.mixer.Sound('C:\\Users\\Mirco\\Desktop\\soundtrack.wav')
-soundtrack.play()
-
 class Game:
 
     def __init__(self):
@@ -28,7 +25,6 @@ class Game:
         self.touchscreeen = True
 
         self.highscore = 0; self.score = 0; self.speed = 1; self.deaths = 0; self.counter = 0
-        self.volume = 100
 
     def events(self):
         keys = pygame.key.get_pressed()
@@ -132,7 +128,6 @@ class Main_Menu:
         self.button_quit = Button(self.screen, 50, 800, 400, 80, GRAY, LIGHT_GRAY, 'QUIT', 'roboto-black', 50, WHITE)
 
         # Settings Menu
-        self.audio_volume = PlusMinusControl(self.screen, 500, 600, game.volume)
         self.button_touchscreen = Button(self.screen, 500, 700, 400, 80, WHITE, WHITE, 'TOUCHSCREEN', 'roboto-black', 50, WHITE)
         self.button_back = Button(self.screen, 500, 800, 400, 80, GRAY, LIGHT_GRAY, 'BACK', 'roboto-black', 50, WHITE)
 
@@ -167,7 +162,6 @@ class Main_Menu:
                     game.save_data()
 
     def updates(self):
-        soundtrack.set_volume(game.volume / 100)
         if game.touchscreeen and self.settings_menu:
             self.button_touchscreen.set_new_color(GREEN, LIGHT_GREEN)
         else:
@@ -182,7 +176,6 @@ class Main_Menu:
             self.button_touchscreen.draw()
             self.button_back.draw()
             #self.button_colors.draw()
-            self.audio_volume.draw()
         self.screen.blit(self.title_shadow, (385, 105))
         self.screen.blit(self.title, (380, 100))
         pygame.display.update()
@@ -310,10 +303,8 @@ class PlusMinusControl:
         if pygame.mouse.get_pressed()[0]:
             if self.plus_button.collidepoint(pygame.mouse.get_pos()) and self.variable < 100:
                 self.variable += 1
-                game.volume += 1
             if self.minus_button.collidepoint(pygame.mouse.get_pos()) and self.variable > 0:
                 self.variable -= 1
-                game.volume -= 1
         self.label = self.variable_font.render(str(self.variable), 1, WHITE)
 
 if __name__ == '__main__':
