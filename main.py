@@ -38,9 +38,10 @@ class Game:
                 pygame.quit()
                 sys.exit()
 
+            # pause the game with the space bar or by clicking the button
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 pause_menu.run()
-                
+
             mouse_pos = pygame.mouse.get_pos()
             if event.type == MOUSEBUTTONDOWN:
                 if self.pause_button.is_clicked(mouse_pos):
@@ -213,11 +214,15 @@ class Pause_Menu:
                 pygame.quit()
                 quit()
 
+            # play again the game if user presses the space bar or the button
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                self.paused = False
+
             if event.type == MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
                 if self.button_back.is_clicked(mouse_pos):
                     self.paused = False
-                if self.button_quit.is_clicked(mouse_pos):
+                elif self.button_quit.is_clicked(mouse_pos):
                     main_menu.run()
 
     def draw(self):
