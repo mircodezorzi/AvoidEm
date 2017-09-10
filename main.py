@@ -1,4 +1,4 @@
-import operator, pygame, random, string, os, sys, time
+import operator, pygame, random, os, sys
 from pygame.locals import *
 from settings import *
 from sprites import *
