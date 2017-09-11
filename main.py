@@ -1,15 +1,8 @@
-import operator, pygame, random, string, os, sys, time
+import operator, pygame, random, os, sys
 from pygame.locals import *
-from threading import *
 from settings import *
 from sprites import *
 from os import path
-
-pygame.init()
-pygame.display.set_caption(TITLE)
-
-soundtrack = pygame.mixer.Sound('C:\\Users\\Mirco\\Desktop\\soundtrack.wav')
-soundtrack.play()
 
 class Game:
 
@@ -19,16 +12,17 @@ class Game:
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
         self.all_sprites = pygame.sprite.Group()
-        self.walls = pygame.sprite.Group()
 
         self.game_font = pygame.font.Font('roboto.ttf', 40)
         self.pause_button = Button(self.screen, 0, 850, 90, 50, BACKGROUND_COLOR, BACKGROUND_COLOR, 'Pause', 'roboto', 20)
 
-        self.game_over = False
         self.touchscreeen = True
 
-        self.highscore = 0; self.score = 0; self.speed = 1; self.deaths = 0; self.counter = 0
-        self.volume = 100
+        self.highscore = 0 
+        self.score = 0 
+        self.speed = 1 
+        self.deaths = 0 
+        self.counter = 0
 
     def events(self):
         keys = pygame.key.get_pressed()
@@ -39,6 +33,10 @@ class Game:
                 game.save_data()
                 pygame.quit()
                 sys.exit()
+
+            # pause the game with the space bar or by clicking the button
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                pause_menu.run()
 
             mouse_pos = pygame.mouse.get_pos()
             if event.type == MOUSEBUTTONDOWN:
@@ -51,7 +49,7 @@ class Game:
         # 5/20 of chance that the enemy is moving
         if not operator.mod(self.score, 10):
             temp = int(random.uniform(0, 20))
-            if   temp >= 1 and temp <= 3 and self.counter <= 0: EnemyWall(self); self.counter = 5
+            if   temp >= 1 and temp <= 3 and self.counter <= 0: EnemyWall(self); self.counter = 10
             elif temp >= 3 and temp <= 8:                       EnemyMoving(self)
             else:                                               Enemy(self)
             self.counter -= 1
@@ -80,7 +78,7 @@ class Game:
     def run(self):
         self.all_sprites.empty()
         self.player = Player(self, WIDTH / 2, HEIGHT * 4 / 5)
-        while not self.game_over:
+        while True:
             try:
                 # If the player pauses the game, this sets dt to normal
                 self.dt = self.clock.tick(FPS) / 10
@@ -91,6 +89,7 @@ class Game:
                 self.update()
                 self.draw()
             except:
+                # The game is finished
                 raise
 
     def save_data(self):
@@ -124,7 +123,7 @@ class Main_Menu:
 
 
         self.settings_menu = False
-        self.app_quit = False
+        #self.app_quit = False
 
         # Main Menu
         self.button_start = Button(self.screen, 50, 600, 400, 80, GRAY, LIGHT_GRAY, 'START', 'roboto-black', 50, WHITE)
@@ -132,7 +131,6 @@ class Main_Menu:
         self.button_quit = Button(self.screen, 50, 800, 400, 80, GRAY, LIGHT_GRAY, 'QUIT', 'roboto-black', 50, WHITE)
 
         # Settings Menu
-        self.audio_volume = PlusMinusControl(self.screen, 500, 600, game.volume)
         self.button_touchscreen = Button(self.screen, 500, 700, 400, 80, WHITE, WHITE, 'TOUCHSCREEN', 'roboto-black', 50, WHITE)
         self.button_back = Button(self.screen, 500, 800, 400, 80, GRAY, LIGHT_GRAY, 'BACK', 'roboto-black', 50, WHITE)
 
@@ -155,7 +153,6 @@ class Main_Menu:
                     pygame.quit()
                     sys.exit()
                 if self.button_start.is_clicked(mouse_pos):
-                    game.game_over = False
                     self.settings_menu = False
                     game.run()
                 if self.button_settings.is_clicked(mouse_pos):
@@ -167,7 +164,6 @@ class Main_Menu:
                     game.save_data()
 
     def updates(self):
-        soundtrack.set_volume(game.volume / 100)
         if game.touchscreeen and self.settings_menu:
             self.button_touchscreen.set_new_color(GREEN, LIGHT_GREEN)
         else:
@@ -182,7 +178,6 @@ class Main_Menu:
             self.button_touchscreen.draw()
             self.button_back.draw()
             #self.button_colors.draw()
-            self.audio_volume.draw()
         self.screen.blit(self.title_shadow, (385, 105))
         self.screen.blit(self.title, (380, 100))
         pygame.display.update()
@@ -214,11 +209,15 @@ class Pause_Menu:
                 pygame.quit()
                 quit()
 
+            # play again the game if user presses the space bar or the button
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                self.paused = False
+
             if event.type == MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
                 if self.button_back.is_clicked(mouse_pos):
                     self.paused = False
-                if self.button_quit.is_clicked(mouse_pos):
+                elif self.button_quit.is_clicked(mouse_pos):
                     main_menu.run()
 
     def draw(self):
@@ -310,13 +309,13 @@ class PlusMinusControl:
         if pygame.mouse.get_pressed()[0]:
             if self.plus_button.collidepoint(pygame.mouse.get_pos()) and self.variable < 100:
                 self.variable += 1
-                game.volume += 1
             if self.minus_button.collidepoint(pygame.mouse.get_pos()) and self.variable > 0:
                 self.variable -= 1
-                game.volume -= 1
         self.label = self.variable_font.render(str(self.variable), 1, WHITE)
 
 if __name__ == '__main__':
+    pygame.init()
+    pygame.display.set_caption(TITLE)
 
     game = Game()
     main_menu = Main_Menu()

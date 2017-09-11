@@ -1,14 +1,16 @@
-import math
+from os import path 
 
-from os import path; game_folder = path.dirname(__file__)
+game_folder = path.dirname(__file__)
 
+### Game variables ###
 TITLE = "AvoidEm!"
 HEIGHT = 900
-WIDTH = math.floor(HEIGHT * (16 / 9))
-
-TILESIZE = 32
+WIDTH = int(HEIGHT * (16 / 9))
 FPS = 60
+TILESIZE = 32
 
+
+### COLORS ###
 BACKGROUND_COLOR = (237, 225, 192)
 ENEMY_COLOR = (66, 64, 59)
 ENEMY_COLOR_WALL = (124, 4, 94)
